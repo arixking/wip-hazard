@@ -1,0 +1,54 @@
+{
+  "name": "wip-hazard",
+  "version": "0.1.0",
+  "description": "A drop-in React banner that overlays a Marathon-inspired Work In Progress hazard strip and continuously scrambles random text across the page.",
+  "keywords": [
+    "react",
+    "wip",
+    "draft",
+    "banner",
+    "scramble",
+    "anime.js",
+    "marathon"
+  ],
+  "author": "Arix",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arix/wip-hazard.git"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run typecheck && npm run build"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "animejs": "4.4.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "animejs": "4.4.0",
+    "react": "^18.3.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0"
+  },
+  "sideEffects": false
+}
