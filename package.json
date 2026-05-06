@@ -15,7 +15,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/arix/wip-hazard.git"
+    "url": "git+https://github.com/arixking/wip-hazard.git"
   },
   "type": "module",
   "main": "./dist/index.cjs",
