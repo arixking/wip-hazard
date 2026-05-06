@@ -8,7 +8,9 @@ export const ITEM_CLASS = 'wip-hazard-item';
 export const SCRAMBLE_ATTR = 'data-wip-scramble';
 export const IGNORE_ATTR = 'data-wip-ignore';
 
-export function wrapperStyle(position: BannerPosition): CSSProperties {
+export function wrapperStyle(
+  position: Exclude<BannerPosition, 'split'>,
+): CSSProperties {
   const base: CSSProperties = {
     position: 'fixed',
     left: 0,
@@ -21,35 +23,73 @@ export function wrapperStyle(position: BannerPosition): CSSProperties {
   return { ...base, top: '50%', transform: 'translateY(-50%)' };
 }
 
-export function bannerStyle(color: string): CSSProperties {
+function withAlpha(color: string, alpha: number): string {
+  const hex = color.trim();
+  const m6 = /^#([0-9a-f]{6})$/i.exec(hex);
+  const m3 = /^#([0-9a-f]{3})$/i.exec(hex);
+  if (m6 && m6[1]) {
+    const h = m6[1];
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+  if (m3 && m3[1]) {
+    const h = m3[1];
+    const r = parseInt(h[0]! + h[0]!, 16);
+    const g = parseInt(h[1]! + h[1]!, 16);
+    const b = parseInt(h[2]! + h[2]!, 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+  return `color-mix(in srgb, ${color} ${Math.round(alpha * 100)}%, transparent)`;
+}
+
+export interface BannerStyleOptions {
+  borderTop?: boolean;
+  borderBottom?: boolean;
+}
+
+export function bannerStyle(
+  color: string,
+  height = 160,
+  fontSize?: number | string,
+  options: BannerStyleOptions = {},
+): CSSProperties {
+  const { borderTop = true, borderBottom = true } = options;
+  const computedFontSize =
+    fontSize ?? `${Math.max(14, Math.round(height * 0.32))}px`;
+  const fontSizeCss =
+    typeof computedFontSize === 'number' ? `${computedFontSize}px` : computedFontSize;
   return {
     width: '100%',
-    height: '160px',
+    height: `${height}px`,
     display: 'flex',
     alignItems: 'center',
-    backgroundColor: color,
-    opacity: 0.85,
-    color: '#0a0a0a',
+    backgroundColor: withAlpha(color, 0.1),
+    color,
+    borderTop: borderTop ? `1px solid ${withAlpha(color, 0.8)}` : 'none',
+    borderBottom: borderBottom ? `1px solid ${withAlpha(color, 0.8)}` : 'none',
+    boxSizing: 'border-box',
     fontFamily:
       'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-    fontSize: '28px',
-    fontWeight: 600,
+    fontSize: fontSizeCss,
+    fontWeight: 400,
     letterSpacing: '0.08em',
     textTransform: 'uppercase',
     overflow: 'hidden',
-    boxShadow:
-      '0 1px 0 rgba(0,0,0,0.35) inset, 0 -1px 0 rgba(0,0,0,0.35) inset',
     userSelect: 'none',
     whiteSpace: 'nowrap',
   };
 }
 
-export const trackStyle: CSSProperties = {
-  display: 'flex',
-  width: 'max-content',
-  willChange: 'transform',
-  animation: 'wip-hazard-marquee 56s linear infinite',
-};
+export function trackStyle(reverse = false): CSSProperties {
+  return {
+    display: 'flex',
+    width: 'max-content',
+    willChange: 'transform',
+    animation: `${reverse ? 'wip-hazard-marquee-reverse' : 'wip-hazard-marquee'} 112s linear infinite`,
+  };
+}
 
 export const itemStyle: CSSProperties = {
   paddingRight: '3rem',
@@ -60,6 +100,10 @@ export const KEYFRAMES_CSS = `
 @keyframes wip-hazard-marquee {
   from { transform: translate3d(0, 0, 0); }
   to   { transform: translate3d(-50%, 0, 0); }
+}
+@keyframes wip-hazard-marquee-reverse {
+  from { transform: translate3d(-50%, 0, 0); }
+  to   { transform: translate3d(0, 0, 0); }
 }
 @media (prefers-reduced-motion: reduce) {
   .${TRACK_CLASS} { animation: none !important; }

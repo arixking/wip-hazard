@@ -1,4 +1,4 @@
-export type BannerPosition = 'top' | 'middle' | 'bottom';
+export type BannerPosition = 'top' | 'middle' | 'bottom' | 'split';
 
 export type BannerCopyPreset = 'INDUSTRIAL' | 'TRANSMISSION' | 'CLINICAL';
 

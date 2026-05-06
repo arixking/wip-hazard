@@ -1,9 +1,13 @@
 import * as React from 'react';
 import { Banner } from './Banner';
+import { CrosshairGrid } from './CrosshairGrid';
 import { ScrambleEngine } from './ScrambleEngine';
-import { resolvePreset } from './presets';
+import { randomDraftId, resolvePreset } from './presets';
 import { WRAPPER_CLASS } from './styles';
 import type { ResolvedCycleTiming, WIPHazardProps } from './types';
+
+const SPLIT_BANNER_HEIGHT = 40;
+const SPLIT_BANNER_FONT_SIZE = '11px';
 
 const DEFAULT_TIMING: ResolvedCycleTiming = {
   scrambleDuration: 400,
@@ -36,8 +40,8 @@ function prefersReducedMotion(): boolean {
 
 export function WIPHazard(props: WIPHazardProps): JSX.Element | null {
   const {
-    bannerColor = '#FF5A1F',
-    bannerPosition = 'middle',
+    bannerColor = '#F9922B',
+    bannerPosition = 'split',
     bannerCopy = 'INDUSTRIAL',
     density,
     cycleTiming,
@@ -45,7 +49,14 @@ export function WIPHazard(props: WIPHazardProps): JSX.Element | null {
     disabled = false,
   } = props;
 
-  const copy = React.useMemo(() => resolvePreset(bannerCopy), [bannerCopy]);
+  const [draftId, setDraftId] = React.useState<string | undefined>(undefined);
+  React.useEffect(() => {
+    setDraftId(randomDraftId());
+  }, []);
+  const copy = React.useMemo(
+    () => resolvePreset(bannerCopy, { draftId }),
+    [bannerCopy, draftId],
+  );
   const timing = React.useMemo(() => resolveTiming(cycleTiming), [cycleTiming]);
   const styleKey = React.useMemo(() => JSON.stringify(scrambleStyle), [scrambleStyle]);
 
@@ -67,6 +78,34 @@ export function WIPHazard(props: WIPHazardProps): JSX.Element | null {
   }, [disabled, density, timing.scrambleDuration, timing.holdDuration, timing.unscrambleDuration, styleKey]);
 
   if (disabled) return null;
+
+  if (bannerPosition === 'split') {
+    return (
+      <>
+        <Banner
+          copy={copy}
+          color={bannerColor}
+          position="top"
+          height={SPLIT_BANNER_HEIGHT}
+          fontSize={SPLIT_BANNER_FONT_SIZE}
+        />
+        <CrosshairGrid
+          color={bannerColor}
+          topInset={SPLIT_BANNER_HEIGHT}
+          bottomInset={SPLIT_BANNER_HEIGHT}
+        />
+        <Banner
+          copy={copy}
+          color={bannerColor}
+          position="bottom"
+          height={SPLIT_BANNER_HEIGHT}
+          fontSize={SPLIT_BANNER_FONT_SIZE}
+          reverse
+          injectKeyframes={false}
+        />
+      </>
+    );
+  }
 
   return <Banner copy={copy} color={bannerColor} position={bannerPosition} />;
 }

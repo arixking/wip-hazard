@@ -1,22 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { WIPHazard } from 'wip-hazard';
 import type { BannerCopyPreset, BannerPosition } from 'wip-hazard';
 
 const PRESETS: BannerCopyPreset[] = ['INDUSTRIAL', 'TRANSMISSION', 'CLINICAL'];
-const POSITIONS: BannerPosition[] = ['top', 'middle', 'bottom'];
+const POSITIONS: BannerPosition[] = ['split', 'top', 'middle', 'bottom'];
 const COLORS: { label: string; value: string }[] = [
-  { label: 'hazard orange', value: '#FF5A1F' },
+  { label: 'hazard orange', value: '#F9922B' },
+  { label: 'eva', value: '#FD0200' },
   { label: 'amber', value: '#F5C518' },
   { label: 'red', value: '#E63946' },
 ];
 
 export default function Page() {
   const [preset, setPreset] = useState<BannerCopyPreset>('INDUSTRIAL');
-  const [position, setPosition] = useState<BannerPosition>('middle');
-  const [color, setColor] = useState<string>('#FF5A1F');
+  const [position, setPosition] = useState<BannerPosition>('split');
+  const [color, setColor] = useState<string>('#F9922B');
   const [disabled, setDisabled] = useState(false);
+  const [lightMode, setLightMode] = useState(false);
+
+  useEffect(() => {
+    const body = document.body;
+    if (lightMode) {
+      body.style.background = '#f7f5ee';
+      body.style.color = '#1c1c1e';
+    } else {
+      body.style.background = '#0e0e10';
+      body.style.color = '#e8e8e8';
+    }
+  }, [lightMode]);
 
   return (
     <main style={{ padding: '64px 8vw 160px', maxWidth: 980, margin: '0 auto' }}>
@@ -105,6 +118,14 @@ export default function Page() {
               onChange={(e) => setDisabled(e.target.checked)}
             />
             &nbsp;disabled
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={lightMode}
+              onChange={(e) => setLightMode(e.target.checked)}
+            />
+            &nbsp;light mode
           </label>
         </div>
       </section>

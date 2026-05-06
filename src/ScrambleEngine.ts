@@ -24,10 +24,12 @@ const SKIP_TAGS = new Set([
 
 const MIN_LEN = 4;
 const MAX_LEN = 12;
-const DENSITY_MIN = 2;
-const DENSITY_MAX = 5;
-const DENSITY_DIVISOR = 1000;
-const NUM_LOOPS = 2;
+const DENSITY_MIN = 1;
+const DENSITY_MAX = 2;
+const DENSITY_DIVISOR = 2000;
+const NUM_LOOPS = 1;
+const IDLE_MIN_MS = 700;
+const IDLE_MAX_MS = 1500;
 const OBSERVER_DEBOUNCE_MS = 500;
 const REFRESH_THROTTLE_MS = 500;
 
@@ -298,7 +300,12 @@ export class ScrambleEngine {
       }
       this.unwrap(span);
       if (this.stopped) return;
-      this.runSlot();
+      const idle = IDLE_MIN_MS + Math.floor(Math.random() * (IDLE_MAX_MS - IDLE_MIN_MS));
+      const t = window.setTimeout(() => {
+        this.slotTimeouts.delete(t);
+        this.runSlot();
+      }, idle);
+      this.slotTimeouts.add(t);
     };
 
     let cancelled = false;
